@@ -1,0 +1,120 @@
+# services:
+#   postgres:
+#     image: postgres:15-alpine
+#     container_name: url-shortener-postgres
+#     environment:
+#       POSTGRES_USER: adminpostgres
+#       POSTGRES_PASSWORD: password123
+#       POSTGRES_DB: urlshortenerpostgres
+#     ports:
+#       - "5432:5432"
+#     volumes:
+#       - postgres_data:/var/lib/postgresql/data
+#       - ./migrations:/docker-entrypoint-initdb.d
+#     healthcheck:
+#       test: ["CMD-SHELL", "pg_isready -U adminpostgres -d urlshortenerpostgres"]
+#       interval: 5s
+#       timeout: 5s
+#       retries: 5
+
+#   # Optional: pgAdmin for database management
+#   pgadmin:
+#     image: dpage/pgadmin4:latest
+#     container_name: url-shortener-pgadmin
+#     environment:
+#       PGADMIN_DEFAULT_EMAIL: admin@localhost.com
+#       PGADMIN_DEFAULT_PASSWORD: admin
+#       PGADMIN_CONFIG_SERVER_MODE: 'False'
+#     ports:
+#       - "5050:80"
+#     depends_on:
+#       - postgres
+#     profiles:
+#       - tools
+
+#   redis:
+#     image: redis:7-alpine
+#     restart: always
+#     ports:
+#       - "6379:6379"
+#     volumes:
+#       - redis_data:/data
+#     healthcheck:
+#       test: ["CMD", "redis-cli", "ping"]   # redis-cli ping returns "PONG" when ready
+#       interval: 5s
+#       timeout: 5s
+#       retries: 5
+
+# # ============================================================
+# # VOLUMES — persistent storage that survives container restarts
+# # ============================================================
+# volumes:
+#   postgres_data:
+#     driver: local
+#   redis_data:
+#     driver: local
+  
+# networks:
+#   default:
+#     name: url-shortener-network
+
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: url-shortener-postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Optional: pgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: url-shortener-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    profiles:
+      - tools
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]   # redis-cli ping returns "PONG" when ready
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+# ============================================================
+# VOLUMES — persistent storage that survives container restarts
+# ============================================================
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  
+networks:
+  default:
+    name: url-shortener-network

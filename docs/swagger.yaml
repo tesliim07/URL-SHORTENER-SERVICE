@@ -1,0 +1,43 @@
+info:
+  contact: {}
+paths:
+  /{code}:
+    get:
+      description: Redirects to the original URL based on the provided code
+      parameters:
+      - description: Short code
+        in: path
+        name: code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "302":
+          description: Found
+      summary: Redirect to original URL
+      tags:
+      - urls
+  /shorten:
+    post:
+      description: Shortens a given URL and returns the shortened version
+      parameters:
+      - description: URL to shorten
+        in: body
+        name: url
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: short_url
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Shorten a URL
+      tags:
+      - urls
+swagger: "2.0"
