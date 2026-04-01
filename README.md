@@ -2,6 +2,7 @@
 A REST API built in Go that shortens URLs, stores them in PostgreSQL, and caches lookups in Redis.
 
 ## Architecture
+```
 url-shortener-service/
 ├── cmd/
 │   └── main.go                  # Entry point — wires everything together
@@ -22,9 +23,10 @@ url-shortener-service/
 ├── docker-compose.yml
 ├── .env                         # Environment variables (not committed)
 └── go.mod
-
+```
 
 ## API Endpoints
+ ```
  - `POST/shorten` : Takes a long URL, returns a short URLGET/{code}
     Content-Type: application/json
     {
@@ -34,6 +36,8 @@ url-shortener-service/
     {
       "short_url": "http://localhost:8080/abc123"
     }
+ ```
+ 
  - `GET /{code}` : Redirects the client to the original URL with a 302 
 
 ## Prerequisites
