@@ -47,6 +47,9 @@ func (c *Cache) SetURL(code, originalURL string) error {
 func (c *Cache) GetURL(code string) (string, error) {
 	ctx := context.Background()
 	originalURL, err := c.client.Get(ctx, code).Result()
+	if err == redis.Nil {
+		return "", nil // not found in cache, return empty string
+	}
 	if err != nil {
 		return "", fmt.Errorf("failed to retrieve cached url: %w", err)
 	}

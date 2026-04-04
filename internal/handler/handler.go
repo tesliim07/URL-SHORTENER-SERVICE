@@ -2,6 +2,7 @@ package handler
 
 import (
 	"url-shortener-service/internal/service"
+	"github.com/rs/zerolog/log"
 
 	"net/http"
 	"encoding/json"
@@ -29,14 +30,18 @@ func (handler *Handler) ShortenURL (write http.ResponseWriter, request *http.Req
 		URL string `json:"url"`
 	}
 	err := json.NewDecoder(request.Body).Decode(&payload)
-	if err != nil {
+	if err != nil || strings.TrimSpace(payload.URL) == "" {
+		log.Error().Err(err).Msg("invalid request body")
 		http.Error(write, "invalid request body", http.StatusBadRequest)
 		return
 	}
 
+
+
 	//call the service to shorten the URL
 	shortURL, err := handler.service.ShortenURL(payload.URL)
 	if err != nil {
+		log.Error().Err(err).Msg("failed to shorten url")
 		http.Error(write, "failed to shorten url", http.StatusInternalServerError)
 		return
 	}
@@ -60,11 +65,13 @@ func (handler *Handler) ShortenURL (write http.ResponseWriter, request *http.Req
 func (handler *Handler) Redirect(write http.ResponseWriter, request *http.Request) {
 	code := strings.TrimPrefix(request.URL.Path, "/")
 	if code == "" {
+		log.Error().Msg("code is required")
 		http.Error(write, "code is required", http.StatusBadRequest)
 		return
 	}
 	originalURL, err := handler.service.GetOriginalURL(code)
 	if err != nil {
+		log.Error().Err(err).Msg("url not found")
 		http.Error(write, "url not found", http.StatusNotFound)
 		return
 	}

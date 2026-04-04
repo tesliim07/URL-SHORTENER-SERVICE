@@ -14,6 +14,8 @@ type Config struct {
 
 	RedisHost string
 	RedisPort string
+
+	AppPort string
 }
 
 func LoadConfig() *Config {
@@ -29,5 +31,7 @@ func LoadConfig() *Config {
 
 		RedisHost: os.Getenv("REDIS_HOST"),
 		RedisPort: os.Getenv("REDIS_PORT"),
+
+		AppPort: os.Getenv("APP_PORT"),
 	}
 }

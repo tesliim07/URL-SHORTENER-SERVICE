@@ -56,7 +56,7 @@ func (repo *Repo) SaveURL(code string, originalURL string) error {
 		originalURL,
 	)
 	if err != nil{
-		return fmt.Errorf("failed to save url: %w", err)
+		return fmt.Errorf("(repository) failed to save url: %w", err)
 	}
 	return err
 }
@@ -68,10 +68,10 @@ func (repo *Repo) GetOriginalURL(code string) (string, error){
 		code,
 	).Scan(&originalURL)
 	if err == sql.ErrNoRows {
-		return "", fmt.Errorf("code not found: %s", code)
+		return "", fmt.Errorf("(repository) code not found: %s", code)
 	}
 	if err != nil{
-		return "", fmt.Errorf("failed to get original url: %w", err)
+		return "", fmt.Errorf("(repository) failed to get original url: %w", err)
 	}
 	return originalURL, err
 }

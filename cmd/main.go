@@ -3,13 +3,13 @@ package main
 import (
 	"net/http"
 	"os"
-	"fmt"
 	
 	"url-shortener-service/config"
 	"url-shortener-service/internal/cache"
 	"url-shortener-service/internal/repository"
 	"url-shortener-service/internal/service"
 	"url-shortener-service/internal/handler"
+	_ "url-shortener-service/docs"
 
 	"github.com/joho/godotenv"
 	"github.com/rs/zerolog"
@@ -24,9 +24,6 @@ func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	err := godotenv.Load(".env")
-	fmt.Println("DB_USER:", os.Getenv("DB_USER"))
-	fmt.Println("DB_PASSWORD:", os.Getenv("DB_PASSWORD"))
-	fmt.Println("DB_NAME:", os.Getenv("DB_NAME"))
 	if err != nil {
 		log.Fatal().Err(err).Msg("Error loading .env file")
 	}
@@ -44,6 +41,10 @@ func main() {
 		log.Fatal().Err(err).Msg("Failed to connect to Redis")
 	}
 
+	if config.AppPort == "" {
+		config.AppPort = "8080" // default port
+	}
+
 	service := service.NewService(repo, redisClient, config)
 	handler := handler.NewHandler(service)
 
@@ -59,7 +60,7 @@ func main() {
 	//Swagger route
 	router.Get("/swagger/*", httpSwagger.WrapHandler)
 
-	err = http.ListenAndServe(":8080", router)
+	err = http.ListenAndServe(":"+config.AppPort, router)
 	if err != nil {
 		log.Fatal().Err(err).Msg("error starting server")
 	}
